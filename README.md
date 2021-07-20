@@ -23,6 +23,9 @@ The user will run ```npm start``` in the terminal to run the project locally on 
   
 ## Contributors
 Janée Artis
+
+## Deployed App
+https://calm-fjord-65301.herokuapp.com/
   
 ## Questions? Contact Me:
 * GitHub: [GitHub Profile](https://github.com/janeeart)

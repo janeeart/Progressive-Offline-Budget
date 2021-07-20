@@ -18,7 +18,7 @@ app.use(express.static("public"));
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/offlinebudget", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-    userCreateIndex: true,  ///changed useCreateIndex
+    userCreateIndex: true,
   useFindAndModify: false
 });
 

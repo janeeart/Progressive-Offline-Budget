@@ -24,42 +24,53 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// The activate handler takes care of cleaning up old caches.
-self.addEventListener('activate', (event) => {
-  const currentCaches = [PRECACHE, RUNTIME];
-  event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
-      })
-      .then((cachesToDelete) => {
-        return Promise.all(
-          cachesToDelete.map((cacheToDelete) => {
-            return caches.delete(cacheToDelete);
+self.addEventListener("activate", function(evt) {
+  evt.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(
+        keyList.map(key => {
+          if (key !== PRECACHE && key !== RUNTIME) {
+            console.log("Removing old cache data", key);
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
+
+  self.clients.claim();
+});
+
+// fetch
+self.addEventListener("fetch", function(evt) {
+  // cache successful requests to the API
+  if (evt.request.url.includes("/api/")) {
+    evt.respondWith(
+      caches.open(RUNTIME).then(cache => {
+        return fetch(evt.request)
+          .then(response => {
+           
+            if (response.status === 200) {
+              cache.put(evt.request.url, response.clone());
+            }
+
+            return response;
           })
-        );
-      })
-      .then(() => self.clients.claim())
+          .catch(err => {
+            return cache.match(evt.request);
+          });
+      }).catch(err => console.log(err))
+    );
+
+    return;
+  }
+
+  
+  evt.respondWith(
+    caches.match(evt.request).then(function(response) {
+      return response || fetch(evt.request);
+    })
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
 
-        return caches.open(RUNTIME).then((cache) => {
-          return fetch(event.request).then((response) => {
-            return cache.put(event.request, response.clone()).then(() => {
-              return response;
-            });
-          });
-        });
-      })
-    );
-  }
-});

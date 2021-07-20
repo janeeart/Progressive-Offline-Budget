@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/herokuname", {
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/offlinebudget", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
     userCreateIndex: true,  ///changed useCreateIndex
